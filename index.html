@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hangman</title>
+  <meta name="theme-color" content="#16110d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;1,9..144,560&family=Outfit:wght@380;500;640&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+  <svg class="grain" aria-hidden="true">
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"></feTurbulence>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)"></rect>
+  </svg>
+
+  <main class="stage">
+    <header class="top">
+      <div class="brand">
+        <p class="eyebrow">Parlor game</p>
+        <h1>Hangman</h1>
+        <p class="lede">Guess the word before the drawing is finished.</p>
+      </div>
+      <div class="stats" aria-label="Score">
+        <div class="stat"><b id="streak">0</b><span>streak</span></div>
+        <div class="stat"><b id="best">0</b><span>best</span></div>
+        <div class="stat"><b id="wins">0</b><span>spared</span></div>
+      </div>
+    </header>
+
+    <section class="play">
+      <aside class="gallows-card" id="gallows">
+        <svg class="scene" viewBox="0 0 300 390" aria-hidden="true">
+          <ellipse cx="118" cy="358" rx="96" ry="10" fill="rgba(0,0,0,0.38)"/>
+          <rect x="18" y="332" width="156" height="16" rx="5" fill="#5c4028"/>
+          <rect x="18" y="332" width="156" height="5" rx="3" fill="#8d6844"/>
+          <rect x="58" y="36" width="16" height="304" rx="4" fill="#6e4c30"/>
+          <rect x="58" y="36" width="5" height="304" fill="#a07848" opacity="0.55"/>
+          <rect x="58" y="28" width="156" height="15" rx="4" fill="#7c5636"/>
+          <rect x="58" y="28" width="156" height="4" fill="#d7b07a" opacity="0.35"/>
+          <polygon points="74,96 74,84 132,36 132,48" fill="#6a482e"/>
+          <path d="M196 43 V100" stroke="#eadcc6" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <ellipse cx="196" cy="110" rx="14" ry="9" fill="none" stroke="#eadcc6" stroke-width="3"/>
+
+          <g class="lantern">
+            <line x1="128" y1="43" x2="128" y2="68" stroke="#eadcc6" stroke-width="2"/>
+            <rect x="116" y="68" width="24" height="30" rx="4" fill="#140e0a" stroke="#e4b15a" stroke-width="1.6"/>
+            <ellipse class="flame" cx="128" cy="82" rx="4" ry="7" fill="#ffe1a3"/>
+          </g>
+
+          <g class="figure" id="figure">
+            <g class="part" data-step="1">
+              <path d="M196 116 V132" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+              <circle cx="196" cy="154" r="22" fill="#241910" stroke="#f4e7d4" stroke-width="3.4"/>
+              <circle class="eyes-dot" cx="188" cy="150" r="2.2" fill="#f4e7d4"/>
+              <circle class="eyes-dot" cx="204" cy="150" r="2.2" fill="#f4e7d4"/>
+              <path class="eyes-x" d="M182 144 l8 8 M190 144 l-8 8 M198 144 l8 8 M206 144 l-8 8" stroke="#f4e7d4" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+              <path class="mouth" d="M187 164 Q196 171 205 164" stroke="#f4e7d4" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+            </g>
+            <path class="part" data-step="2" pathLength="1" d="M196 176 V240" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <path class="part" data-step="3" pathLength="1" d="M196 194 L158 226" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <path class="part" data-step="4" pathLength="1" d="M196 194 L234 226" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <path class="part" data-step="5" pathLength="1" d="M196 240 L164 302" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <path class="part" data-step="6" pathLength="1" d="M196 240 L228 302" stroke="#f4e7d4" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="pips" id="pips" aria-hidden="true"></div>
+        <p class="chances" id="chances">6 chances left</p>
+      </aside>
+
+      <section class="board">
+        <div class="cats" id="cats" role="tablist" aria-label="Categories"></div>
+        <p class="prompt" id="prompt"></p>
+        <p class="clue" id="clue"></p>
+        <div class="word" id="word" aria-label="Secret word"></div>
+        <p class="meta" id="meta"></p>
+        <div class="keys" id="keys"></div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="hint">Reveal a letter · costs 1</button>
+          <button type="button" class="btn solid" id="fresh">New word</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay" inert aria-hidden="true">
+    <div class="result" role="dialog" aria-modal="true" aria-labelledby="result-title">
+      <p class="kicker" id="kicker"></p>
+      <h2 id="result-title"></h2>
+      <p class="answer" id="answer"></p>
+      <p class="result-copy" id="result-copy"></p>
+      <button type="button" class="btn solid" id="again">Another word</button>
+    </div>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <p class="sr" id="live" aria-live="polite"></p>
+  <script src="game.js"></script>
+</body>
+</html>
